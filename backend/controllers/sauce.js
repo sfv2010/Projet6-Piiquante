@@ -30,7 +30,7 @@ exports.modifySauce = (req, res, next) => {
               ...JSON.parse(req.body.sauce),
               imageUrl: `${req.protocol}://${req.get("host")}/images/${req.file.filename}`,
           }
-        : { ...req.body };
+        : { ...req.body }; //sinon on laisse
 
     delete sauceObject._userId; //on supprime pour la sécurité
     Sauce.findOne({ _id: req.params.id }) //Verifier si la personne demandant la modification de l’objet est la propriétaire de celui-ci.
@@ -48,17 +48,17 @@ exports.modifySauce = (req, res, next) => {
         });
 };
 
-//Supprimer une sauce
+//Supprimer une sauce : suppression d'une sauce de bd, le fichier image correspondant aussi doit être supprimé
 exports.deleteSauce = (req, res, next) => {
     Sauce.findOne({ _id: req.params.id }) //vérifier si l’utilisateur qui a fait la requête de suppression est bien celui qui a créé le Sauce
         .then((sauce) => {
             if (sauce.userId != req.auth.userId) {
                 res.status(401).json({ message: "Non-autorisé" });
             } else {
-                const filename = sauce.imageUrl.split("/images/")[1];
+                const filename = sauce.imageUrl.split("/images/")[1]; // split() : récupére le nom de ficher autour du répertoire images
                 fs.unlink(`images/${filename}`, () => {
                     //la fonction unlink du package fs pour supprimer ce fichier, en lui passant le fichier à supprimer et le callback à exécuter une fois ce fichier supprimé.
-                    Sauce.deleteOne({ _id: req.params.id })
+                    Sauce.deleteOne({ _id: req.params.id }) // après surpprimer l'image,on supprime l'enregistrement de BD
                         .then(() => {
                             res.status(200).json({ message: "Sauce supprimé !" });
                         })
@@ -85,10 +85,43 @@ exports.getOneSauce = (req, res, next) => {
         .catch((error) => res.status(404).json({ error }));
 };
 
-//J'aime ou je n'aime pas la sauce
-// exports.likeOrDislikeSauce = (req, res) => {
-//   if(){
-
-//   }
-
-// }
+//Like ou dislike ou aucun des deux
+exports.likeOrDislikeSauce = (req, res) => {
+    // Si like = 1 : l'utilisateur aime la sauce
+    if (req.body.like === 1) {
+        return Sauce.updateOne(
+            { _id: req.params.id },
+            { $inc: { likes: 1 }, $push: { usersLiked: req.body.userId } } //query selecta il faut mettre d'abord $inc. MongoDBのupdateは、第2引数で渡した内容で上書き保存します
+        )
+            .then(() => res.status(200).json({ message: "J'aime!" }))
+            .catch((error) => res.status(400).json({ error }));
+    }
+    // Si like = -1 : l'utilisateur n'aime pas la sauce
+    if (req.body.like === -1) {
+        return Sauce.updateOne(
+            { _id: req.params.id },
+            { $inc: { dislikes: 1 }, $push: { usersDisliked: req.body.userId } }
+        )
+            .then(() => res.status(200).json({ message: "Je n'aime pas!" }))
+            .catch((error) => res.status(400).json({ error }));
+    }
+    // Si like = 0 : utilisateur annule son like ou dislike
+    Sauce.findOne({ _id: req.params.id }).then((sauce) => {
+        if (req.body.like === 0)
+            if (sauce.usersLiked.includes(req.body.userId)) {
+                Sauce.updateOne(
+                    { _id: req.params.id },
+                    { $inc: { likes: -1 }, $pull: { usersLiked: req.body.userId } }
+                )
+                    .then(() => res.status(200).json({ message: "like annulé !" }))
+                    .catch((error) => res.status(400).json({ error }));
+            } else if (sauce.usersDisliked.includes(req.body.userId)) {
+                Sauce.updateOne(
+                    { _id: req.params.id },
+                    { $inc: { dislikes: -1 }, $pull: { usersDisliked: req.body.userId } }
+                )
+                    .then(() => res.status(200).json({ message: "dislike annulé !" }))
+                    .catch((error) => res.status(400).json({ error }));
+            }
+    });
+};
