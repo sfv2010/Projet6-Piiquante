@@ -22,6 +22,6 @@ router.get("/:id", auth, sauceCtrl.getOneSauce);
 router.get("/", auth, sauceCtrl.getAllSauce);
 
 //---Route pour lliker ou disliker
-//router.post('/:id/like', auth, sauceCtrl.likeOrDislikeSauce);
+router.post("/:id/like", auth, sauceCtrl.likeOrDislikeSauce);
 
 module.exports = router; // exporter 輸出 書き出す.
