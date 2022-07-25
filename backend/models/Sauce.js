@@ -2,7 +2,7 @@ const mongoose = require("mongoose"); //on importe mongoose.
 
 const sauceSchema = mongoose.Schema({
     //la fonction Schema() qui nous est mis à disposition par mongoose.
-    // _id sera généré automatiquement par mangoDB.donc on a apas besoin d'ajouter.
+    // _id sera généré automatiquement par mangoDB. On a pas besoin d'ajouter.
     userId: { type: String, required: true },
     name: { type: String, required: true },
     manufacturer: { type: String, required: true },
@@ -12,8 +12,8 @@ const sauceSchema = mongoose.Schema({
     heat: { type: Number, required: true },
     likes: { type: Number, default: 0 },
     dislikes: { type: Number, default: 0 },
-    usersLiked: { type: [String], default: [] },
-    usersDisliked: { type: [String], default: [] },
+    usersLiked: { type: [String], required: true },
+    usersDisliked: { type: [String], required: true },
 });
 
 //ensuite, nous exportons ce schéma en tant que modèle Mongoose appelé « sauce »,
