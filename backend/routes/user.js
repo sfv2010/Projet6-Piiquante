@@ -5,7 +5,7 @@ const router = express.Router();
 const rateLimit = require("express-rate-limit"); //L’ express-rate-limit est le package npm pour limiter la demande de l’utilisateur.
 const limiter = rateLimit({
     windowMs: 1 * 60 * 1000, // 1 minute
-    max: 2, // limiter même IP du 3 requests par windowMs
+    max: 2, // limiter même IP du 2 requests par windowMs
     message: "Trop de requêtes de cette IP",
 });
 
