@@ -87,26 +87,26 @@ exports.getOneSauce = (req, res, next) => {
 
 //Like ou dislike ou aucun des deux
 exports.likeOrDislikeSauce = (req, res) => {
-    // Si like = 1 : l'utilisateur aime la sauce
-    if (req.body.like === 1) {
-        return Sauce.updateOne(
-            { _id: req.params.id },
-            { $inc: { likes: 1 }, $push: { usersLiked: req.body.userId } } //query selecta il faut mettre d'abord $inc. MongoDBのupdateは、第2引数で渡した内容で上書き保存します
-        )
-            .then(() => res.status(200).json({ message: "J'aime!" }))
-            .catch((error) => res.status(400).json({ error }));
-    }
-    // Si like = -1 : l'utilisateur n'aime pas la sauce
-    if (req.body.like === -1) {
-        return Sauce.updateOne(
-            { _id: req.params.id },
-            { $inc: { dislikes: 1 }, $push: { usersDisliked: req.body.userId } }
-        )
-            .then(() => res.status(200).json({ message: "Je n'aime pas!" }))
-            .catch((error) => res.status(400).json({ error }));
-    }
-    // Si like = 0 : utilisateur annule son like ou dislike
     Sauce.findOne({ _id: req.params.id }).then((sauce) => {
+        // Si like = 1 : l'utilisateur aime la sauce
+        if (req.body.like === 1 && !sauce.usersLiked.includes(req.body.userId)) {
+            return Sauce.updateOne(
+                { _id: req.params.id },
+                { $inc: { likes: 1 }, $push: { usersLiked: req.body.userId } } //query selecta il faut mettre d'abord $inc. MongoDBのupdateは、第2引数で渡した内容で上書き保存します
+            )
+                .then(() => res.status(200).json({ message: "J'aime!" }))
+                .catch((error) => res.status(400).json({ error }));
+        }
+        // Si like = -1 : l'utilisateur n'aime pas la sauce
+        if (req.body.like === -1 && !sauce.usersLiked.includes(req.body.userId)) {
+            return Sauce.updateOne(
+                { _id: req.params.id },
+                { $inc: { dislikes: 1 }, $push: { usersDisliked: req.body.userId } }
+            )
+                .then(() => res.status(200).json({ message: "Je n'aime pas!" }))
+                .catch((error) => res.status(400).json({ error }));
+        }
+        // Si like = 0 : l'utilisateur annule son like ou dislike
         if (req.body.like === 0)
             if (sauce.usersLiked.includes(req.body.userId)) {
                 Sauce.updateOne(
