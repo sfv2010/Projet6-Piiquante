@@ -8,6 +8,6 @@ const userSchema = mongoose.Schema({
     password: { type: String, required: true }, // hashs est striong
 });
 
-userSchema.plugin(uniqueValidator); //améliore les messages d'erreur lors de l'enregistrement de données uniques.
+userSchema.plugin(uniqueValidator); //améliore les messages d'erreur lors de l'enregistrement de données uniques.Pour ne pas enregistrer 2fois la même adresse mail.
 
 module.exports = mongoose.model("User", userSchema); // on export

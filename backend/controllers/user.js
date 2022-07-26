@@ -1,18 +1,20 @@
 ////---Configurez les routes d'authentification coté implémentation de la logique métier.
 
 const bcrypt = require("bcrypt");
+const cryptoJs = require("crypto-js");
 const jwt = require("jsonwebtoken"); //Nous utilisons la fonction sign de jsonwebtoken pour chiffrer un nouveau token.
-
 const User = require("../models/User");
+//const passwordValidator = require("password-validator");
 
 exports.signup = (req, res, next) => {
-    //pour connecter la premiere fois
+    //Pour crypter des emails
+    const emailCrypto = cryptoJs.HmacSHA256(req.body.email, "KEY_SECRET").toString();
     //La méthode  hash()  de bcrypt crée un hash crypté des mots de passe de vos utilisateurs pour les enregistrer de manière sécurisée dans la base de données.
     bcrypt
-        .hash(req.body.password, 10) // (le mot de passe du corps de la rêquête qui sera pqssé pqr le frontend, le salt,c'est cobien de fois on execute l'algo de hashage (ici 10fois)
+        .hash(req.body.password, 10) // (le mot de passe du corps de la rêquête qui sera pqssé par le frontend, le salt,c'est cobien de fois on execute l'algo de hashage (ici 10fois)
         .then((hash) => {
             const user = new User({
-                email: req.body.email,
+                email: emailCrypto,
                 password: hash,
             });
             user.save()
@@ -23,8 +25,9 @@ exports.signup = (req, res, next) => {
 };
 
 exports.login = (req, res, next) => {
+    const emailCrypto = cryptoJs.HmacSHA256(req.body.email, "KEY_SECRET").toString();
     //pour connecter cliens dejà enregistré
-    User.findOne({ email: req.body.email })
+    User.findOne({ email: emailCrypto })
         .then((user) => {
             if (user === null) {
                 res.status(401) //401 Unauthorized
