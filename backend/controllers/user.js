@@ -4,11 +4,11 @@ const bcrypt = require("bcrypt");
 const cryptoJs = require("crypto-js");
 const jwt = require("jsonwebtoken"); //Nous utilisons la fonction sign de jsonwebtoken pour chiffrer un nouveau token.
 const User = require("../models/User");
-//const passwordValidator = require("password-validator");
 
 exports.signup = (req, res, next) => {
     //Pour crypter des emails
     const emailCrypto = cryptoJs.HmacSHA256(req.body.email, "KEY_SECRET").toString();
+
     //La méthode  hash()  de bcrypt crée un hash crypté des mots de passe de vos utilisateurs pour les enregistrer de manière sécurisée dans la base de données.
     bcrypt
         .hash(req.body.password, 10) // (le mot de passe du corps de la rêquête qui sera pqssé par le frontend, le salt,c'est cobien de fois on execute l'algo de hashage (ici 10fois)
