@@ -1,5 +1,4 @@
-const express = require("express"); // Importer express expressのモジュールを読み込んでオン絵を受ける
-//const rateLimit = require("express-rate-limit"); //L’ express-rate-limit est le package npm pour limiter la demande de l’utilisateur.
+const express = require("express"); // Importer express
 
 const app = express(); //Pour créer une application Express,on utilise la méthode express() express module を実体化してインスタンスにするコピーをする,という行為がインスタンス化
 
@@ -17,12 +16,6 @@ require("dotenv").config();
 //--- Sécuriser les requêtes HTML---
 app.use(helmet());
 
-// const apiRequestLimiter = rateLimit({
-//     windowMs: 1 * 60 * 1000, // 1 minute
-//     max: 2, // limit each IP to 2 requests per windowMs
-//     message: "Trop de requêtes de cette IP",
-// });
-// app.use(apiRequestLimiter);
 //--- Connecter mangooDB---
 mongoose
     .connect(process.env.MONGO_URL)
