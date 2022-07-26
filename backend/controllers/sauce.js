@@ -2,7 +2,7 @@
 const Sauce = require("../models/Sauce"); //importer 輸入 取り込む
 const fs = require("fs"); //fs signifie file system qui donne accès aux fonctions qui permettent de modifier le système de fichiers, y compris aux fonctions permettant de supprimer les fichiers.
 
-//Création d'une sauce
+//---Création d'une sauce---
 exports.createSauce = (req, res, next) => {
     const sauceObject = JSON.parse(req.body.sauce); // convertir sous format JSON car le front-end envoie les données de la requête sous la forme form-data
     delete sauceObject._id; // id d'objet va être générée automatiquement par notre bd
@@ -23,7 +23,7 @@ exports.createSauce = (req, res, next) => {
         });
 };
 
-//Modifier une sauce
+//---Modifier une sauce---
 exports.modifySauce = (req, res, next) => {
     const sauceObject = req.file // verifier si l'utilisateur a mis à jour l'image ou pas
         ? {
@@ -48,7 +48,7 @@ exports.modifySauce = (req, res, next) => {
         });
 };
 
-//Supprimer une sauce : suppression d'une sauce de bd, le fichier image correspondant aussi doit être supprimé
+//---Supprimer une sauce : suppression d'une sauce de bd, le fichier image correspondant aussi doit être supprimé---
 exports.deleteSauce = (req, res, next) => {
     Sauce.findOne({ _id: req.params.id }) //vérifier si l’utilisateur qui a fait la requête de suppression est bien celui qui a créé le Sauce
         .then((sauce) => {
@@ -71,21 +71,21 @@ exports.deleteSauce = (req, res, next) => {
         });
 };
 
-//Récupérer toutes les sauces
+//---Récupérer toutes les sauces---
 exports.getAllSauce = (req, res, next) => {
     Sauce.find()
         .then((sauces) => res.status(200).json(sauces))
         .catch((error) => res.status(400).json({ error }));
 };
 
-// Récupérer une seule sauce
+//---Récupérer une seule sauce---
 exports.getOneSauce = (req, res, next) => {
     Sauce.findOne({ _id: req.params.id })
         .then((sauce) => res.status(200).json(sauce))
         .catch((error) => res.status(404).json({ error }));
 };
 
-//Like ou dislike ou aucun des deux
+//---Like ou dislike ou aucun des deux---
 exports.likeOrDislikeSauce = (req, res) => {
     Sauce.findOne({ _id: req.params.id }).then((sauce) => {
         // Si like = 1 : l'utilisateur aime la sauce
