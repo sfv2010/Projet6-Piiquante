@@ -13,6 +13,7 @@ const normalizePort = (val) => {
     }
     return false;
 };
+
 const port = normalizePort(process.env.PORT || "3000"); //la fonction normalizePort renvoie un port valide, qu'il soit fourni sous la forme d'un numéro ou d'une chaîne
 app.set("port", port); // indiquer à application express ,sur quelle port elle va tourner
 

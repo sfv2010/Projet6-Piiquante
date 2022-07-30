@@ -9,24 +9,16 @@ passwordSchema
     .is()
     .max(100) // Maximum length 100
     .has()
-    .uppercase() // Must have uppercase letters
+    .uppercase() // Doit avoir uppercase letters
     .has()
-    .lowercase() // Must have lowercase letters
+    .lowercase() // Doit avoir lowercase letters
     .has()
-    .digits(2) // Must have at least 2 digits
+    .digits(2) // Doit avoir au moins 2 chiffres
     .has()
     .not()
-    .spaces() // Should not have spaces
+    .spaces() // Ne doit pas avoir d'espaces
     .is()
     .not()
     .oneOf(["Passw0rd", "Password123"]);
 
-// module.exports = (req, res, next) => {
-//     if (passwordSchema.validate(req.body.password)) {
-//         //res.status(201).json({ message: "Le mots de passe est fort!" });
-//         next();
-//     } else {
-//         return res.status(400).json({ message: "Le mot de passe est faible!" });
-//     }
-// };
 module.exports = passwordSchema;
