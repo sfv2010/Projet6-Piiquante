@@ -1,13 +1,13 @@
 ////---Configurez les routes d'authentification coté implémentation de la logique métier.
-
 const bcrypt = require("bcrypt");
 const cryptoJs = require("crypto-js");
 const jwt = require("jsonwebtoken"); //Nous utilisons la fonction sign de jsonwebtoken pour chiffrer un nouveau token.
 const User = require("../models/User");
+require("dotenv").config();
 
 exports.signup = (req, res, next) => {
     //Pour crypter des emails
-    const emailCrypto = cryptoJs.HmacSHA256(req.body.email, "KEY_SECRET").toString();
+    const emailCrypto = cryptoJs.HmacSHA256(req.body.email, process.env.PASSWORD_SECRET).toString();
 
     //La méthode  hash()  de bcrypt crée un hash crypté des mots de passe de vos utilisateurs pour les enregistrer de manière sécurisée dans la base de données.
     bcrypt
@@ -25,7 +25,7 @@ exports.signup = (req, res, next) => {
 };
 
 exports.login = (req, res, next) => {
-    const emailCrypto = cryptoJs.HmacSHA256(req.body.email, "KEY_SECRET").toString();
+    const emailCrypto = cryptoJs.HmacSHA256(req.body.email, process.env.PASSWORD_SECRET).toString();
     //pour connecter cliens dejà enregistré
     User.findOne({ email: emailCrypto })
         .then((user) => {
@@ -46,7 +46,7 @@ exports.login = (req, res, next) => {
                                 userId: user._id,
                                 token: jwt.sign(
                                     { userId: user._id },
-                                    "RANDOM_TOKEN_SECRET", //une chaîne secrète de développement temporaire RANDOM_SECRET_KEY pour crypter notre token (à remplacer par une chaîne aléatoire beaucoup plus longue pour la production)
+                                    process.env.TOKEN_SECRET, //une chaîne secrète de développement temporaire RANDOM_SECRET_KEY pour crypter notre token (à remplacer par une chaîne aléatoire beaucoup plus longue pour la production)
                                     { expiresIn: "24h" } //chaque token est valable que 24h(Nous définissons la durée de validité du token à 24 heures. L'utilisateur devra donc se reconnecter au bout de 24 heures.)
                                 ),
                             });
