@@ -1,6 +1,11 @@
 //---Configurez les contrôleurs---
-const Sauce = require("../models/Sauce"); //importer 輸入 取り込む
+
+//---Importation---
+
+const Sauce = require("../models/Sauce");
 const fs = require("fs"); //fs signifie file system qui donne accès aux fonctions qui permettent de modifier le système de fichiers, y compris aux fonctions permettant de supprimer les fichiers.
+
+//---Logique métier---
 
 //---Création d'une sauce---
 exports.createSauce = (req, res, next) => {
@@ -35,7 +40,7 @@ exports.modifySauce = (req, res, next) => {
     delete sauceObject._userId; //on supprime pour la sécurité
     Sauce.findOne({ _id: req.params.id }) //Verifier si la personne demandant la modification de l’objet est la propriétaire de celui-ci.
         .then((sauce) => {
-            if (sauce.userId != req.auth.userId) {
+            if (sauce.userId !== req.auth.userId) {
                 res.status(401).json({ message: "Non-autorisé" });
             } else {
                 Sauce.updateOne({ _id: req.params.id }, { ...sauceObject, _id: req.params.id })
@@ -52,7 +57,7 @@ exports.modifySauce = (req, res, next) => {
 exports.deleteSauce = (req, res, next) => {
     Sauce.findOne({ _id: req.params.id }) //vérifier si l’utilisateur qui a fait la requête de suppression est bien celui qui a créé le Sauce
         .then((sauce) => {
-            if (sauce.userId != req.auth.userId) {
+            if (sauce.userId !== req.auth.userId) {
                 res.status(401).json({ message: "Non-autorisé" });
             } else {
                 const filename = sauce.imageUrl.split("/images/")[1]; // split() : récupére le nom de ficher autour du répertoire images
@@ -86,19 +91,19 @@ exports.getOneSauce = (req, res, next) => {
 };
 
 //---Like ou dislike ou aucun des deux---
-exports.likeOrDislikeSauce = (req, res) => {
+exports.likeOrDislikeSauce = (req, res, next) => {
     Sauce.findOne({ _id: req.params.id }).then((sauce) => {
         // Si like = 1 : l'utilisateur aime la sauce
         if (req.body.like === 1 && !sauce.usersLiked.includes(req.body.userId)) {
             return Sauce.updateOne(
                 { _id: req.params.id },
-                { $inc: { likes: 1 }, $push: { usersLiked: req.body.userId } } //query selecta il faut mettre d'abord $inc. MongoDBのupdateは、第2引数で渡した内容で上書き保存します
+                { $inc: { likes: 1 }, $push: { usersLiked: req.body.userId } } //query selecta il faut mettre d'abord $inc.
             )
                 .then(() => res.status(200).json({ message: "J'aime!" }))
                 .catch((error) => res.status(400).json({ error }));
         }
         // Si like = -1 : l'utilisateur n'aime pas la sauce
-        if (req.body.like === -1 && !sauce.usersLiked.includes(req.body.userId)) {
+        if (req.body.like === -1 && !sauce.usersDisliked.includes(req.body.userId)) {
             return Sauce.updateOne(
                 { _id: req.params.id },
                 { $inc: { dislikes: 1 }, $push: { usersDisliked: req.body.userId } }
