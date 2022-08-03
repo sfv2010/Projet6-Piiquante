@@ -7,10 +7,11 @@ module.exports = (req, res, next) => {
     try {
         //---Récupération le token dans le header, second élément du tableau.Le premier contien le mot "Bearer". La fonction split pour récupérer après l'espace---
         const token = req.headers.authorization.split(" ")[1];
-        //---fonction verify pour décoder notre token---
+        //---fonction verify pour décoder et vérifier notre token---
         const decodedToken = jwt.verify(token, process.env.TOKEN_SECRET);
-        //---Récupération de l'ID utilisateur de notre token et le rajoutons à l’objet Request afin que nos différentes routes puissent l’exploiter---
+        //---Récupération de l'userId de notre token ---
         const userId = decodedToken.userId;
+        //---attribuer l'objet userId de notre token à l’objet Request afin que nos différentes routes puissent l’exploiter
         req.auth = {
             userId: userId,
         };
