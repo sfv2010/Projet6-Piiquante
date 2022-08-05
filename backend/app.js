@@ -1,20 +1,17 @@
+//---importation---
 const express = require("express"); // Importer express
-
-const app = express(); //Pour créer une application Express,on utilise la méthode express() express module を実体化してインスタンスにするコピーをする,という行為がインスタンス化
-
+const app = express(); //Pour créer une application Express,on utilise la méthode express
 const mongoose = require("mongoose");
 
-const sauceRoutes = require("./routes/sauce");
-
-const userRoutes = require("./routes/user"); // importez le routeur pour enregistrons notre routeur dans notre application
-
+const sauceRoutes = require("./routes/sauce"); // importez le routeur pour enregistrons notre routeur dans notre application
+const userRoutes = require("./routes/user");
 const path = require("path"); //traiter les requêtes vers la route /image,
 
 const helmet = require("helmet");
 require("dotenv").config();
 
 //--- Sécuriser les requêtes HTML---
-app.use(helmet());
+app.use(helmet()); // la methode express app.use s'exécute sur tous les types de requêtes HTTP .
 
 //--- Connecter mangooDB---
 mongoose
@@ -39,9 +36,8 @@ app.use((req, res, next) => {
 
 //---Route---
 app.use("/images", express.static(path.join(__dirname, "images"))); //le gestionnaire de routage
-app.use("/api/sauces", sauceRoutes); // rajouter un premiere argument sous forme de chane de caractere
-// //qui sera l'URL visée par l'application = Endpoint ou route sur notre API
-// // url total sera = http//localhost:3000/api/sauces
-app.use("/api/auth", userRoutes); //enregistrez-le notre routeur dans notre application :
+app.use("/api/sauces", sauceRoutes); // premiere argument qui sera l'endpoint ou route sur notre API (url total = http//localhost:3000/api/sauces).
+app.use("/api/auth", userRoutes); //la route d'authentification.
 
+//---Exportation---
 module.exports = app; // exporter cette application pour qu'on puisse y acceder depuis les autres fichiers de notre projet

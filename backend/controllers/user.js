@@ -51,7 +51,7 @@ exports.login = (req, res, next) => {
                                 userId: user._id,
                                 token: jwt.sign(
                                     //3 arguments
-                                    { userId: user._id }, //playload: //encodage du userId pour la création du nouveau objet(objet et userId sernt liés)
+                                    { userId: user._id }, //playload: encodage du userId pour la création du nouveau objet(objet et userId seront liés)
                                     process.env.TOKEN_SECRET, //une chaîne secrète de développement temporaire RANDOM_SECRET_KEY pour crypter notre token (à remplacer par une chaîne aléatoire beaucoup plus longue pour la production)
                                     { expiresIn: "24h" } //chaque token est valable que 24h(Nous définissons la durée de validité du token à 24 heures. L'utilisateur devra donc se reconnecter au bout de 24 heures.)
                                 ),

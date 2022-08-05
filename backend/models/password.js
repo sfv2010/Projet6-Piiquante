@@ -9,16 +9,17 @@ passwordSchema
     .is()
     .max(100) // Maximum length 100
     .has()
-    .uppercase() // Doit avoir uppercase letters
+    .uppercase() // Must have uppercase letters
     .has()
-    .lowercase() // Doit avoir lowercase letters
+    .lowercase() // Must have lowercase letters
     .has()
-    .digits(2) // Doit avoir au moins 2 chiffres
+    .digits(2) // Must have at least 2 digits
     .has()
     .not()
-    .spaces() // Ne doit pas avoir d'espaces
+    .spaces() // Should not have spaces
     .is()
     .not()
     .oneOf(["Passw0rd", "Password123"]);
 
+//---Exportation (vers middleware)---
 module.exports = passwordSchema;

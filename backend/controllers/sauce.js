@@ -11,10 +11,11 @@ const fs = require("fs"); //fs signifie file system qui donne accès aux fonctio
 exports.createSauce = (req, res, next) => {
     const sauceObject = JSON.parse(req.body.sauce); // convertir sous format JSON car le front-end envoie les données de la requête sous la forme form-data
     delete sauceObject._id; // id d'objet va être générée automatiquement par notre bd
-    delete sauceObject._userId; //supprimer le champ_userId de la requête envoyée par le client car nous ne devons pas lui faire confiance
+    delete sauceObject.userId; //supprimer le champ userId de la requête envoyée par le client car nous ne devons pas lui faire confiance
     const sauce = new Sauce({
+        //Une instance d'un modèle Sauce
         ...sauceObject,
-        userId: req.auth.userId, //le remplaçons en base de données par le _userId extrait du token par le middleware d’authentification.
+        userId: req.auth.userId, //le remplaçons en base de données par le userId extrait du token par le middleware d’authentification.
         imageUrl: `${req.protocol}://${req.get("host")}/images/${req.file.filename}`, //On a besoin de "req.protocol" et "req.get('host')", connectés par  '://'  et suivis de req.file.filename, pour reconstruire l'URL complète du fichier enregistré.
     });
 
@@ -37,10 +38,10 @@ exports.modifySauce = (req, res, next) => {
           }
         : { ...req.body }; //sinon on laisse
 
-    delete sauceObject._userId; //on supprime pour la sécurité
     Sauce.findOne({ _id: req.params.id }) //Verifier si la personne demandant la modification de l’objet est la propriétaire de celui-ci.
         .then((sauce) => {
             if (sauce.userId !== req.auth.userId) {
+                //si userId ne correspond pas celui de userId extrait du token par le middleware d’authentification.
                 res.status(401).json({ message: "Non-autorisé" });
             } else {
                 Sauce.updateOne({ _id: req.params.id }, { ...sauceObject, _id: req.params.id })
@@ -51,6 +52,7 @@ exports.modifySauce = (req, res, next) => {
         .catch((error) => {
             res.status(400).json({ error });
         });
+    console.log(req.body);
 };
 
 //---Supprimer une sauce : suppression d'une sauce de bd, le fichier image correspondant aussi doit être supprimé---
@@ -97,7 +99,7 @@ exports.likeOrDislikeSauce = (req, res, next) => {
         if (req.body.like === 1 && !sauce.usersLiked.includes(req.body.userId)) {
             return Sauce.updateOne(
                 { _id: req.params.id },
-                { $inc: { likes: 1 }, $push: { usersLiked: req.body.userId } } //query selecta il faut mettre d'abord $inc.
+                { $inc: { likes: 1 }, $push: { usersLiked: req.body.userId } } //query selecta il faut mettre d'abord $inc. MongoDBのupdateは、第2引数で渡した内容で上書き保存します
             )
                 .then(() => res.status(200).json({ message: "J'aime!" }))
                 .catch((error) => res.status(400).json({ error }));

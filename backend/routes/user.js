@@ -1,6 +1,8 @@
 //---Configuration les routes d'authentification---
+
+//---Importation---
 const express = require("express");
-const router = express.Router();
+const router = express.Router(); //methode express.Router()
 const userCtrl = require("../controllers/user");
 const password = require("../middleware/password");
 
@@ -12,7 +14,9 @@ const limiter = rateLimit({
     message: "Trop de requêtes de cette IP",
 });
 
+//---Router---
 router.post("/signup", password, userCtrl.signup);
 router.post("/login", limiter, userCtrl.login);
 
+//---Exportation---
 module.exports = router;
