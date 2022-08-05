@@ -1,10 +1,14 @@
-// ---multer : permet de gérer les fichiers entrants dans les requêtes HTTP.
-const multer = require("multer");
+// ---Importation---
+const multer = require("multer"); // multer : permet de gérer les fichiers entrants dans les requêtes HTTP.
 
+//---le dictionnaire de MINE TYPES---
 const MIME_TYPES = {
     "image/jpg": "jpg",
     "image/jpeg": "jpg",
     "image/png": "png",
+    "image/gif": "gif",
+    "image/bmp": "bmp",
+    "image/webp": "webp",
 };
 
 //---La méthode diskStorage() configure le chemin et le nom de fichier pour les fichiers entrants---
