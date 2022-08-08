@@ -1,4 +1,4 @@
-//---Configurez le routage---
+//---La logique de routing---
 
 //---Importation---
 
@@ -15,7 +15,7 @@ const sauceCtrl = require("../controllers/sauce");
 //---Route pour créer un objet ---
 router.post("/", auth, multer, sauceCtrl.createSauce);
 //---Route pour modifier un objet ---
-router.put("/:id", auth, multer, sauceCtrl.modifySauce);
+router.put("/:id", auth, multer, sauceCtrl.modifySauce); //Le :(deux-points) ici dit à Express que cette partie de la route est dynamique  pour la rendre accessible en tant que paramètre
 //---Route pour supprimer un objet---
 router.delete("/:id", auth, multer, sauceCtrl.deleteSauce);
 //---Route pour afficher un seul objet dans la base de donées par son id

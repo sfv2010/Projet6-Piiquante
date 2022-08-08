@@ -19,12 +19,15 @@ exports.signup = (req, res, next) => {
   bcrypt
     .hash(req.body.password, 10) // (le mot de passe du corps de la rêquête qui sera passé par le frontend, le salt,c'est combien de fois on execute l'algo de hashage (ici 10fois)
     .then((hash) => {
+      //récupérer le hash de mot de passe, et enregistrer dans un nouveau user qu'on va enregistrer dans la base de données.
+      // créer ce nouvel utilisateur avec notre modèle Mongoose
       const user = new User({
+        //on va enregistrer l'email crypté et le mot de passe crypté pour ne pas stocker l'email et le mot de passe en blanc
         email: emailCrypto,
         password: hash,
       });
       user
-        .save()
+        .save() // enregistrer dans la base de donées
         .then(() => res.status(201).json({ message: "Utilisateur créé !" })) // 201 Created
         .catch((error) => res.status(400).json({ error })); //400 Bad Request
     })
@@ -38,35 +41,37 @@ exports.login = (req, res, next) => {
     .toString();
   User.findOne({ email: emailCrypto })
     .then((user) => {
+      // si l'utilisateur  n'existe pas
       if (user === null) {
-        res
+        return res
           .status(401) //401 Unauthorized
           .json({ message: "Paire identifiant/mot de passe incorrecte" }); //le message doit être flou pour ne pas faire fuite de données(ne pas pouvoir verifier si l'utilisateur est enregistré ou pas de la part de l'utilisateur)
-      } else {
-        bcrypt
-          .compare(req.body.password, user.password) //fonction compare()de bcrypt pour comparer le mot de passe entré par l'utilisateur avec le hash enregistré dans la base de données (Cela montre que même bcrypt ne peut pas décrypter ses propres hashs).
-          .then((valid) => {
-            if (!valid) {
-              res.status(401).json({
-                message: "Paire identifiant/mot de passe incorrecte",
-              });
-            } else {
-              res.status(200).json({
-                //envoie dans la response du serveur du userId et du token d'auth
-                // 200 ok
-                userId: user._id,
-                token: jwt.sign(
-                  { userId: user._id }, //encodage du userId pour la création du nouveau objet(objet et userId seront liés)
-                  process.env.TOKEN_SECRET, //une chaîne secrète de développement temporaire RANDOM_SECRET_KEY pour crypter notre token (à remplacer par une chaîne aléatoire beaucoup plus longue pour la production)
-                  { expiresIn: "24h" } //chaque token est valable que 24h(Nous définissons la durée de validité du token à 24 heures. L'utilisateur devra donc se reconnecter au bout de 24 heures.)
-                ),
-              });
-            }
-          })
-          .catch((error) => {
-            res.status(500).json({ error }); //500 Internal Server Error
-          });
       }
+      //si l'utilisateur  existe
+      bcrypt
+        .compare(req.body.password, user.password) //fonction compare()de bcrypt pour comparer le mot de passe entré par l'utilisateur avec le hash enregistré dans la base de données (Cela montre que même bcrypt ne peut pas décrypter ses propres hashs).
+        .then((valid) => {
+          //si le mot de passe n'est pas correct
+          if (!valid) {
+            return res.status(401).json({
+              message: "Paire identifiant/mot de passe incorrecte",
+            });
+          }
+          // si le mot de passe est correct
+          res.status(200).json({
+            //renvoyer une réponse 200 avec le userId et le token d'auth.
+            userId: user._id,
+            //la fonction sign de jwt pour chiffrer un nouveau token.
+            token: jwt.sign(
+              { userId: user._id }, // l'ID de utilisateur   en tant que payload (les données encodées dans le token).
+              process.env.TOKEN_SECRET, //Clé secrète pour l'encodage
+              { expiresIn: "24h" } //chaque token est valable que 24h(Nous définissons la durée de validité du token à 24 heures. L'utilisateur devra donc se reconnecter au bout de 24 heures.)
+            ),
+          });
+        })
+        .catch((error) => {
+          res.status(500).json({ error }); //500 Internal Server Error
+        });
     })
     .catch((error) => {
       res.status(500).json({ error });
